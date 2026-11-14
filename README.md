@@ -341,7 +341,7 @@ Going right
                             strange. That wasn't there the first time. Do you enter it?
                                 Yes: you stomp the vent open, then crawl into it. the vent leads into a room with somekind of 
                                 horrible treelike creature in there sleeping. Do you go back up or enter the room?
-                                    Go back up: (stumble into the boxes, end up in a cellar, blah blah blah)
+                                    Go back up: (stumble into the boxes, end up in a cellar, and die)
                                     Enter the room: you enter the room, careful not to wake up the beast. You quickly realize 
                                     there is nothing to be found here other than the creature and a second glowing object next to it.
                                     the one you hold reacts strongly to the second one. Do you leave, or try to grab the other one?
