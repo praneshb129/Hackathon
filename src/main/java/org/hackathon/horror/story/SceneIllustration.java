@@ -76,6 +76,7 @@ public class SceneIllustration extends JPanel {
         switch (scene) {
             case START:
             case GATES:
+            case WOODS_PATH_CHOICE:
             case LEFT_ROAD:
             case RUN:
             case KEEP_RUNNING:

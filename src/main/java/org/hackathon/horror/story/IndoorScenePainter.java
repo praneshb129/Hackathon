@@ -9,6 +9,7 @@ final class IndoorScenePainter {
             case LEAVE_MANOR:
                 drawManor(g, width, height);
                 break;
+            case DOOR_KICKED:
             case ENTER_MANOR:
                 drawChamber(g, width, height);
                 break;

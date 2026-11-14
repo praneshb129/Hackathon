@@ -48,7 +48,14 @@ public class StoryGame {
                         + "You climb the steps to an old wooden door. Do you slowly open it?";
                 choices = List.of(
                         new StoryPanel.Choice("Yes, open the door", Scene.ENTER_MANOR),
-                        new StoryPanel.Choice("No, leave the door closed", Scene.LEAVE_MANOR));
+                        new StoryPanel.Choice("Kick the door open", Scene.DOOR_KICKED));
+                break;
+            case DOOR_KICKED:
+                text = "You kick the door open. It crashes to the floor, and you step into the manor. "
+                        + "A glowing object brightly illuminates the chamber. Do you pick it up or leave it be?";
+                choices = List.of(
+                        new StoryPanel.Choice("Pick up the object", Scene.PICK_UP_OBJECT),
+                        new StoryPanel.Choice("Ignore it", Scene.IGNORE_OBJECT));
                 break;
             case ENTER_MANOR:
                 text = "You slowly open the door, peek inside, and step into the manor. "
@@ -133,6 +140,13 @@ public class StoryGame {
                 choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
                 break;
             case KEEP_RUNNING:
+                text = "You push yourself to run as fast as you can and spot a path leading into the woods. "
+                        + "Do you take the path? Choose Yes or No.";
+                choices = List.of(
+                        new StoryPanel.Choice("Yes", Scene.FOREST_DASH),
+                        new StoryPanel.Choice("No", Scene.WOODS_PATH_CHOICE));
+                break;
+            case WOODS_PATH_CHOICE:
                 text = "You continue sprinting. Both you and the creature begin to slow down, but you "
                         + "are tiring much faster. Do you tough it out and keep sprinting, or try your luck "
                         + "with the path into the woods?";

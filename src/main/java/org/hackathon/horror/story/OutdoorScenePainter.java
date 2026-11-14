@@ -29,6 +29,7 @@ final class OutdoorScenePainter {
             case LEFT_ROAD:
             case RUN:
             case KEEP_RUNNING:
+            case WOODS_PATH_CHOICE:
                 drawRoad(g, width, height);
                 break;
             default:
