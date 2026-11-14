@@ -61,8 +61,18 @@ public class HackathonApp {
                 addChoice("No, leave the door closed", Scene.LEAVE_MANOR);
                 break;
             case ENTER_MANOR:
-                setStory("You slowly open the door, peeking inside before entering the manor. "
-                        + "A cold draft brushes past you. Your adventure continues...");
+                setStory("You slowly open the door, peek inside, and step into the manor. "
+                        + "A glowing object brightly illuminates the chamber. Do you pick it up or leave it be?");
+                addChoice("Pick up the object", Scene.PICK_UP_OBJECT);
+                addChoice("Ignore it", Scene.IGNORE_OBJECT);
+                break;
+            case PICK_UP_OBJECT:
+                setStory("You pick up the object and hold it close to your chest. "
+                        + "Its warmth is comforting.");
+                addChoice("Start over", Scene.START);
+                break;
+            case IGNORE_OBJECT:
+                setStory("You ignore the glowing object, thinking it is nothing important.");
                 addChoice("Start over", Scene.START);
                 break;
             case LEAVE_MANOR:
@@ -163,9 +173,13 @@ public class HackathonApp {
                     drawGates(g);
                     break;
                 case MANOR_DOOR:
-                case ENTER_MANOR:
                 case LEAVE_MANOR:
-                    drawManor(g, scene == Scene.ENTER_MANOR);
+                    drawManor(g, false);
+                    break;
+                case ENTER_MANOR:
+                case PICK_UP_OBJECT:
+                case IGNORE_OBJECT:
+                    drawChamber(g, scene == Scene.PICK_UP_OBJECT);
                     break;
                 case LEFT_ROAD:
                 case RUN:
@@ -295,6 +309,50 @@ public class HackathonApp {
             g.drawString("EMPTY ROAD", 14, 22);
         }
 
+        private void drawChamber(Graphics2D g, boolean objectPickedUp) {
+            setBackground(new Color(16, 17, 29));
+            g.setColor(new Color(16, 17, 29));
+            g.fillRect(0, 0, getWidth(), getHeight());
+
+            g.setColor(new Color(48, 47, 57));
+            g.fillRect(35, 25, getWidth() - 70, getHeight() - 25);
+            g.setColor(new Color(69, 65, 72));
+            for (int y = 55; y < getHeight() - 35; y += 42) {
+                g.drawLine(35, y, getWidth() - 35, y);
+            }
+            for (int x = 70; x < getWidth() - 35; x += 75) {
+                g.drawLine(x, 25, x, getHeight() - 35);
+            }
+
+            int orbX = objectPickedUp ? getWidth() / 2 - 42 : getWidth() / 2 - 12;
+            int orbY = objectPickedUp ? getHeight() / 2 + 5 : getHeight() / 2 - 12;
+            g.setColor(new Color(255, 215, 80, 35));
+            g.fillOval(orbX - 40, orbY - 40, 100, 100);
+            g.setColor(new Color(255, 218, 112, 90));
+            g.fillOval(orbX - 20, orbY - 20, 60, 60);
+            g.setColor(new Color(255, 244, 190));
+            g.fillOval(orbX, orbY, 20, 20);
+
+            if (objectPickedUp) {
+                g.setColor(new Color(210, 210, 218));
+                g.setStroke(new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g.drawOval(getWidth() / 2 - 55, getHeight() / 2 - 45, 22, 22);
+                g.drawLine(getWidth() / 2 - 44, getHeight() / 2 - 22,
+                        getWidth() / 2 - 44, getHeight() / 2 + 28);
+                g.drawLine(getWidth() / 2 - 44, getHeight() / 2 - 5, orbX + 3, orbY + 10);
+                g.drawLine(getWidth() / 2 - 44, getHeight() / 2 - 5,
+                        getWidth() / 2 - 60, getHeight() / 2 + 10);
+                g.drawLine(getWidth() / 2 - 44, getHeight() / 2 + 28,
+                        getWidth() / 2 - 58, getHeight() / 2 + 52);
+                g.drawLine(getWidth() / 2 - 44, getHeight() / 2 + 28,
+                        getWidth() / 2 - 28, getHeight() / 2 + 52);
+            }
+
+            g.setColor(new Color(235, 225, 190));
+            g.drawString(objectPickedUp ? "THE OBJECT'S WARMTH" : "A GLOWING OBJECT",
+                    14, 18);
+        }
+
         private void drawPerson(Graphics2D g) {
             int groundY = getHeight() - 30;
             int bodyY = groundY - 55;
@@ -315,6 +373,8 @@ public class HackathonApp {
         GATES,
         MANOR_DOOR,
         ENTER_MANOR,
+        PICK_UP_OBJECT,
+        IGNORE_OBJECT,
         LEAVE_MANOR,
         LEFT_ROAD,
         RUN,
