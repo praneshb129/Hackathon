@@ -3,10 +3,11 @@ package org.hackathon.horror.story;
 import java.awt.*;
 
 final class IndoorScenePainter {
+    private static final Font CAPTION_FONT = new Font("SansSerif", Font.BOLD, 12);
+
     void paint(Graphics2D g, int width, int height, Scene scene, int personX) {
         switch (scene) {
             case MANOR_DOOR:
-            case LEAVE_MANOR:
                 drawManor(g, width, height);
                 break;
             case DOOR_KICKED:
@@ -131,6 +132,11 @@ final class IndoorScenePainter {
     }
 
     private void drawDimRoom(Graphics2D g, int width, int height, boolean ventVisible) {
+        drawDimRoom(g, width, height, ventVisible, true);
+    }
+
+    private void drawDimRoom(Graphics2D g, int width, int height,
+                             boolean ventVisible, boolean showCaption) {
         fillBackground(g, width, height, new Color(43, 42, 44));
         g.setColor(new Color(65, 62, 58));
         g.fillRect(45, 28, width - 90, height - 28);
@@ -157,11 +163,13 @@ final class IndoorScenePainter {
                 g.drawLine(x, height - 43, x, height - 21);
             }
         }
-        drawCaption(g, ventVisible ? "A DUSTY VENT" : "THE DIM ROOM");
+        if (showCaption) {
+            drawCaption(g, ventVisible ? "A DUSTY VENT" : "THE DIM ROOM");
+        }
     }
 
     private void drawBoxes(Graphics2D g, int width, int height) {
-        drawDimRoom(g, width, height, false);
+        drawDimRoom(g, width, height, false, false);
         g.setColor(new Color(93, 65, 43));
         g.fillRect(width / 2 - 55, height - 78, 105, 58);
         g.fillRect(width / 2 - 5, height - 115, 85, 40);
@@ -240,12 +248,21 @@ final class IndoorScenePainter {
     }
 
     private void fillBackground(Graphics2D g, int width, int height, Color color) {
-        g.setColor(color);
+        g.setPaint(new GradientPaint(0, 0, color, 0, Math.max(1, height), color.darker()));
         g.fillRect(0, 0, width, height);
+        g.setColor(color);
     }
 
     private void drawCaption(Graphics2D g, String caption) {
-        g.setColor(new Color(220, 220, 205));
-        g.drawString(caption, 14, 18);
+        Font previousFont = g.getFont();
+        g.setFont(CAPTION_FONT);
+        FontMetrics metrics = g.getFontMetrics();
+        int x = 10;
+        int y = 6;
+        g.setColor(new Color(7, 10, 15, 185));
+        g.fillRoundRect(x, y, metrics.stringWidth(caption) + 16, 24, 8, 8);
+        g.setColor(new Color(229, 227, 216));
+        g.drawString(caption, x + 8, y + 16);
+        g.setFont(previousFont);
     }
 }

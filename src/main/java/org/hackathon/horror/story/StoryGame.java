@@ -1,17 +1,30 @@
 package org.hackathon.horror.story;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.DoubleSupplier;
 
 public class StoryGame {
-    private final StoryPanel view = new StoryPanel(this::showScene);
+    private final StoryView view;
+    private final DoubleSupplier randomSource;
     private boolean hasLamp;
+
+    public StoryGame() {
+        view = new StoryPanel(this::showScene);
+        randomSource = Math::random;
+    }
+
+    StoryGame(StoryView view, DoubleSupplier randomSource) {
+        this.view = Objects.requireNonNull(view, "view");
+        this.randomSource = Objects.requireNonNull(randomSource, "randomSource");
+    }
 
     public void start() {
         showScene(Scene.START);
         view.setVisible(true);
     }
 
-    private void showScene(Scene scene) {
+    void showScene(Scene scene) {
         if (scene == Scene.START) {
             hasLamp = false;
         }
@@ -22,6 +35,10 @@ public class StoryGame {
         }
         if (scene == Scene.DIM_ROOM) {
             showDimRoom();
+            return;
+        }
+        if (scene == Scene.CELLAR) {
+            showCellar(false);
             return;
         }
 
@@ -74,16 +91,11 @@ public class StoryGame {
                 choices = List.of(new StoryPanel.Choice("Continue", Scene.DIM_ROOM));
                 break;
             case BOXES_CHOICE:
-                text = "You round a corner and stop in front of a pile of boxes. Do you move them "
+                text = "You stay in the room, back near the pile of boxes. Do you move them "
                         + "and continue this path, or turn around?";
                 choices = List.of(
                         new StoryPanel.Choice("Move the boxes", Scene.CELLAR),
                         new StoryPanel.Choice("Turn around", Scene.VENT_DISCOVERY));
-                break;
-            case CELLAR:
-                text = "You stumble into the pile of boxes and end up in a cellar. A man is chained "
-                        + "to the walls. He appears to be asleep.";
-                choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
                 break;
             case CELLAR_CAUGHT:
                 text = "You climb back up through the vent, stumble into the pile of boxes, and tumble "
@@ -96,7 +108,7 @@ public class StoryGame {
                         + "underneath the dust. Strange... it wasn't there the first time. Do you enter it?";
                 choices = List.of(
                         new StoryPanel.Choice("Enter the vent", Scene.VENT_CREATURE_CHOICE),
-                        new StoryPanel.Choice("Stay in the room", Scene.CELLAR));
+                        new StoryPanel.Choice("Stay in the room", Scene.BOXES_CHOICE));
                 break;
             case VENT_CREATURE_CHOICE:
                 text = "You stomp the vent open and crawl through. It leads to a room where a horrible "
@@ -113,15 +125,13 @@ public class StoryGame {
                         : "The object glows beside the sleeping creature. ")
                         + "Do you leave or try to grab it?";
                 choices = List.of(
-                        new StoryPanel.Choice("Leave", Scene.CELLAR),
+                        new StoryPanel.Choice("Leave", Scene.CELLAR_CAUGHT),
                         new StoryPanel.Choice("Grab the second object", Scene.GRAB_SECOND_OBJECT));
                 break;
             case GRAB_SECOND_OBJECT:
-                text = "You slowly advance toward the second glowing object...";
-                choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
-                break;
-            case LEAVE_MANOR:
-                text = "You decide not to open the door. As you step away, the door creaks open behind you...";
+                text = "The two objects flare together. The creature wakes, but recoils from their "
+                        + "light. You grab both and crawl back through the vent as it claws at the "
+                        + "doorway. Safe above, you look down: a third light blinks in your hand. The End.";
                 choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
                 break;
             case LEFT_ROAD:
@@ -197,12 +207,13 @@ public class StoryGame {
                 break;
             case FOREST_BREAK_RUN:
                 text = "You burst from your hiding place and sprint through the trees. Branches claw at "
-                        + "your clothes as the creature's roar follows close behind. The End.";
+                        + "your clothes as the creature's roar follows close behind. You stumble over a "
+                        + "root, and the creature catches up. The forest goes quiet. The End.";
                 choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
                 break;
             case CROSS_STREET:
-                text = "You sprint across the empty street. The creature crashes into the road behind you, "
-                        + "and you disappear into the darkness. The End.";
+                text = "You sprint across the empty road and are hit by a bazooka. Somehow, you survive, "
+                        + "but the creature sweeps you off your feet, grabs you, and eats you. The End.";
                 choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
                 break;
             case MINESHAFT_ENTER:
@@ -261,17 +272,33 @@ public class StoryGame {
                 + "The windows are boarded up, and water drips faintly onto the floor. "
                 + "You wander aimlessly, unsure what you're looking for. ";
 
-        if (Math.random() < 0.5) {
-            text += "Rounding a corner, you stumble into a pile of boxes and catch yourself. "
-                    + "Do you move them and continue, or turn around?";
-        } else {
-            text += "Rounding a corner, you stop in front of a pile of boxes. "
-                    + "Do you move them and continue, or turn around?";
+        if (randomSource.getAsDouble() < 0.5) {
+            showCellar(true);
+            return;
         }
 
+        text += "Rounding a corner, you stop in front of a pile of boxes. "
+                + "Do you move them and continue, or turn around?";
         List<StoryPanel.Choice> choices = List.of(
                 new StoryPanel.Choice("Move the boxes", Scene.CELLAR),
                 new StoryPanel.Choice("Turn around", Scene.VENT_DISCOVERY));
         view.displayScene(text, Scene.BOXES_CHOICE, choices);
     }
+
+    private void showCellar(boolean stumbledIntoBoxes) {
+        String text = stumbledIntoBoxes
+                ? "You round a corner, stumble into a pile of boxes, and tumble into a cellar. "
+                : "You move the boxes and enter a cellar. ";
+        text += "A man is chained to the walls. He appears to be asleep. A chain scrapes across "
+                + "the floor. The man wakes and grabs your wrist. His chain jerks taut as he drags "
+                + "you back from the stairs. The cellar door slams, and the darkness closes in. The End.";
+        view.displayScene(text, Scene.CELLAR,
+                List.of(new StoryPanel.Choice("Start over", Scene.START)));
+    }
+}
+
+interface StoryView {
+    void displayScene(String text, Scene scene, List<StoryPanel.Choice> choices);
+
+    void setVisible(boolean visible);
 }
