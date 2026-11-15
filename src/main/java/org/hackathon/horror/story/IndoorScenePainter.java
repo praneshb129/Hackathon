@@ -30,6 +30,7 @@ final class IndoorScenePainter {
                 drawBoxes(g, width, height);
                 break;
             case CELLAR:
+            case CELLAR_CAUGHT:
                 drawCellar(g, width, height);
                 break;
             case VENT_DISCOVERY:

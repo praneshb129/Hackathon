@@ -15,6 +15,7 @@ public enum Scene {
     DIM_ROOM,
     BOXES_CHOICE,
     CELLAR,
+    CELLAR_CAUGHT,
     VENT_DISCOVERY,
     VENT_CREATURE_CHOICE,
     CREATURE_ROOM,

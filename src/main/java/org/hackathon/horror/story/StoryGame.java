@@ -85,6 +85,12 @@ public class StoryGame {
                         + "to the walls. He appears to be asleep.";
                 choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
                 break;
+            case CELLAR_CAUGHT:
+                text = "You climb back up through the vent, stumble into the pile of boxes, and tumble "
+                        + "into the cellar. The chained man wakes as you hit the floor. Before you can "
+                        + "escape, the darkness closes in. The End.";
+                choices = List.of(new StoryPanel.Choice("Start over", Scene.START));
+                break;
             case VENT_DISCOVERY:
                 text = "You turn around, not wanting to move the boxes, and notice a vent hidden "
                         + "underneath the dust. Strange... it wasn't there the first time. Do you enter it?";
@@ -96,7 +102,7 @@ public class StoryGame {
                 text = "You stomp the vent open and crawl through. It leads to a room where a horrible "
                         + "tree-like creature is sleeping. Do you climb back up or enter the room?";
                 choices = List.of(
-                        new StoryPanel.Choice("Go back up", Scene.CELLAR),
+                        new StoryPanel.Choice("Go back up", Scene.CELLAR_CAUGHT),
                         new StoryPanel.Choice("Enter the room", Scene.CREATURE_ROOM));
                 break;
             case CREATURE_ROOM:
@@ -251,14 +257,21 @@ public class StoryGame {
     }
 
     private void showDimRoom() {
-        if (Math.random() * 100 < 50) {
-            showScene(Scene.CELLAR);
+        String text = "You make it out of the dark hallway and enter a dimly lit room. "
+                + "The windows are boarded up, and water drips faintly onto the floor. "
+                + "You wander aimlessly, unsure what you're looking for. ";
+
+        if (Math.random() < 0.5) {
+            text += "Rounding a corner, you stumble into a pile of boxes and catch yourself. "
+                    + "Do you move them and continue, or turn around?";
         } else {
-            String text = "You make it out of the dark hallway and enter a dimly lit room. "
-                    + "The windows are boarded up, and water drips faintly onto the floor. "
-                    + "You wander aimlessly, unsure what you're looking for. Rounding a corner...";
-            view.displayScene(text, Scene.DIM_ROOM, List.of(
-                    new StoryPanel.Choice("Continue", Scene.BOXES_CHOICE)));
+            text += "Rounding a corner, you stop in front of a pile of boxes. "
+                    + "Do you move them and continue, or turn around?";
         }
+
+        List<StoryPanel.Choice> choices = List.of(
+                new StoryPanel.Choice("Move the boxes", Scene.CELLAR),
+                new StoryPanel.Choice("Turn around", Scene.VENT_DISCOVERY));
+        view.displayScene(text, Scene.BOXES_CHOICE, choices);
     }
 }
