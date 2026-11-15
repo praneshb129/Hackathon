@@ -16,7 +16,7 @@ public class SceneIllustration extends JPanel {
 
     public SceneIllustration() {
         setPreferredSize(new Dimension(500, 190));
-        setBackground(new Color(25, 30, 45));
+        setBackground(new Color(13, 12, 11));
         timer = new Timer(16, event -> advanceAnimation());
         timer.setCoalesce(true);
         addHierarchyListener(event -> {

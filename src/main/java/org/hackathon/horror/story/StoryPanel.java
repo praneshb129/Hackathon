@@ -4,22 +4,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class StoryPanel extends JFrame implements StoryView {
-    private static final Color BACKGROUND = new Color(19, 22, 31);
-    private static final Color SURFACE = new Color(34, 39, 52);
-    private static final Color STORY_BACKGROUND = new Color(39, 44, 57);
-    private static final Color STORY_FOREGROUND = new Color(237, 233, 225);
-    private static final Color BORDER_COLOR = new Color(65, 73, 89);
-    private static final Color BUTTON_BACKGROUND = new Color(145, 52, 70);
-    private static final Color BUTTON_HOVER = new Color(177, 64, 82);
-    private static final Color BUTTON_PRESSED = new Color(111, 39, 56);
-    private static final Font BODY_FONT = new Font("SansSerif", Font.PLAIN, 18);
-    private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 15);
+    private static final Color BACKGROUND = new Color(13, 12, 11);
+    private static final Color STORY_FOREGROUND = new Color(232, 226, 212);
+    private static final Color MUTED_FOREGROUND = new Color(138, 131, 120);
+    private static final Color ACCENT = new Color(217, 164, 65);
+    private static final Color BORDER_COLOR = new Color(42, 38, 34);
+    private static final Color BUTTON_BORDER = new Color(74, 68, 60);
+    private static final Font BODY_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+    private static final Font BUTTON_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 14);
     private static final int CHOICE_GAP = 14;
-    private static final int BUTTON_HEIGHT = 62;
+    private static final int BUTTON_HEIGHT = 48;
     private static final int MIN_BUTTON_WIDTH = 180;
 
     private final JTextArea storyText = new JTextArea();
@@ -33,8 +32,8 @@ public class StoryPanel extends JFrame implements StoryView {
         this.sceneSelected = sceneSelected;
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1080, 700);
-        setMinimumSize(new Dimension(720, 600));
+        setSize(784, 700);
+        setMinimumSize(new Dimension(720, 640));
 
         storyText.setEditable(false);
         storyText.setLineWrap(true);
@@ -42,25 +41,28 @@ public class StoryPanel extends JFrame implements StoryView {
         storyText.setRows(5);
         storyText.setFont(BODY_FONT);
         storyText.setForeground(STORY_FOREGROUND);
-        storyText.setBackground(STORY_BACKGROUND);
-        storyText.setMargin(new Insets(24, 28, 24, 28));
-        storyText.setCaretColor(STORY_FOREGROUND);
-        storyText.setSelectionColor(BUTTON_HOVER);
-        storyText.setSelectedTextColor(Color.WHITE);
+        storyText.setOpaque(false);
+        storyText.setMargin(new Insets(16, 18, 16, 18));
+        storyText.setCaretColor(ACCENT);
+        storyText.setSelectionColor(new Color(217, 164, 65, 90));
+        storyText.setSelectedTextColor(STORY_FOREGROUND);
 
         JScrollPane storyScrollPane = new JScrollPane(storyText);
         storyScrollPane.setBorder(BorderFactory.createLineBorder(BORDER_COLOR));
+        storyScrollPane.setOpaque(false);
         storyScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         storyScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         storyScrollPane.getVerticalScrollBar().setUnitIncrement(18);
+        storyScrollPane.getViewport().setOpaque(false);
+        storyScrollPane.getVerticalScrollBar().setBackground(BACKGROUND);
+        storyScrollPane.getVerticalScrollBar().setForeground(MUTED_FOREGROUND);
 
-        illustration.setPreferredSize(new Dimension(900, 250));
+        illustration.setPreferredSize(new Dimension(720, 360));
         illustration.setMinimumSize(new Dimension(480, 180));
         illustration.setBorder(BorderFactory.createLineBorder(BORDER_COLOR));
 
         choicesPanel.setLayout(new FlowLayout(FlowLayout.CENTER, CHOICE_GAP, 4));
-        choicesPanel.setBackground(SURFACE);
-        choicesPanel.setOpaque(true);
+        choicesPanel.setOpaque(false);
         choicesPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER_COLOR),
                 BorderFactory.createEmptyBorder(10, 8, 0, 8)));
@@ -71,9 +73,26 @@ public class StoryPanel extends JFrame implements StoryView {
             }
         });
 
-        JPanel content = new JPanel(new BorderLayout(0, 12));
+        JPanel content = new JPanel(new BorderLayout(0, 20)) {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                super.paintComponent(graphics);
+                Graphics2D g = (Graphics2D) graphics.create();
+                try {
+                    float radius = Math.max(getWidth(), getHeight()) * 0.85f;
+                    g.setPaint(new RadialGradientPaint(
+                            new Point2D.Float(getWidth() / 2f, getHeight() * 0.3f),
+                            Math.max(1f, radius),
+                            new float[]{0f, 1f},
+                            new Color[]{new Color(28, 24, 21), BACKGROUND}));
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                } finally {
+                    g.dispose();
+                }
+            }
+        };
         content.setBackground(BACKGROUND);
-        content.setBorder(BorderFactory.createEmptyBorder(16, 20, 12, 20));
+        content.setBorder(BorderFactory.createEmptyBorder(20, 24, 16, 24));
         content.add(illustration, BorderLayout.NORTH);
         content.add(storyScrollPane, BorderLayout.CENTER);
         content.add(choicesPanel, BorderLayout.SOUTH);
@@ -91,7 +110,7 @@ public class StoryPanel extends JFrame implements StoryView {
         int buttonWidth = MIN_BUTTON_WIDTH;
         FontMetrics metrics = choicesPanel.getFontMetrics(BUTTON_FONT);
         for (Choice choice : choices) {
-            buttonWidth = Math.max(buttonWidth, metrics.stringWidth(choice.getLabel()) + 44);
+            buttonWidth = Math.max(buttonWidth, metrics.stringWidth(choice.getLabel()) + 40);
         }
         Dimension buttonSize = new Dimension(buttonWidth, BUTTON_HEIGHT);
         for (Choice choice : choices) {
@@ -109,8 +128,8 @@ public class StoryPanel extends JFrame implements StoryView {
     private ChoiceButton createChoiceButton(Choice choice, Dimension size) {
         ChoiceButton button = new ChoiceButton(choice.getLabel());
         button.setFont(BUTTON_FONT);
-        button.setForeground(Color.WHITE);
-        button.setBackground(BUTTON_BACKGROUND);
+        button.setForeground(STORY_FOREGROUND);
+        button.setBackground(BACKGROUND);
         button.setOpaque(false);
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
@@ -160,22 +179,19 @@ public class StoryPanel extends JFrame implements StoryView {
 
         @Override
         protected void paintComponent(Graphics graphics) {
+            boolean highlighted = getModel().isRollover() || hasFocus();
+            setForeground(highlighted ? ACCENT : STORY_FOREGROUND);
             Graphics2D g = (Graphics2D) graphics.create();
             try {
                 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                         RenderingHints.VALUE_ANTIALIAS_ON);
-                Color fill = getModel().isPressed() && getModel().isArmed()
-                        ? BUTTON_PRESSED
-                        : getModel().isRollover() ? BUTTON_HOVER : BUTTON_BACKGROUND;
-                int inset = 4;
-                g.setColor(fill);
-                g.fillRoundRect(inset, inset, getWidth() - inset * 2,
-                        getHeight() - inset * 2, 20, 20);
-                g.setColor(hasFocus() ? new Color(255, 236, 239, 230)
-                        : new Color(255, 255, 255, 45));
-                g.setStroke(new BasicStroke(hasFocus() ? 2f : 1f));
-                g.drawRoundRect(inset, inset, getWidth() - inset * 2 - 1,
-                        getHeight() - inset * 2 - 1, 20, 20);
+                boolean pressed = getModel().isPressed() && getModel().isArmed();
+                g.setColor(pressed ? new Color(217, 164, 65, 34)
+                        : highlighted ? new Color(217, 164, 65, 16) : new Color(0, 0, 0, 0));
+                g.fillRect(1, 1, getWidth() - 2, getHeight() - 2);
+                g.setColor(highlighted || pressed ? ACCENT : BUTTON_BORDER);
+                g.setStroke(new BasicStroke(1f));
+                g.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
             } finally {
                 g.dispose();
             }
